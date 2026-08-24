@@ -9,9 +9,10 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  DropdownMenuGroup,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
+
 
 export function TopBar({ userEmail }: { userEmail: string | undefined }) {
   const router = useRouter();
@@ -37,24 +38,24 @@ export function TopBar({ userEmail }: { userEmail: string | undefined }) {
 
       <div className="flex items-center gap-4">
         <DropdownMenu>
-          <DropdownMenuTrigger>
-            <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-              <Avatar className="h-8 w-8 border border-border">
-                <AvatarFallback className="bg-primary/20 text-primary text-xs">
-                  {userEmail?.charAt(0).toUpperCase() || "U"}
-                </AvatarFallback>
-              </Avatar>
-            </Button>
+          <DropdownMenuTrigger className="relative flex h-8 w-8 items-center justify-center rounded-full outline-none hover:bg-accent hover:text-accent-foreground cursor-pointer transition-colors focus-visible:ring-1 focus-visible:ring-ring">
+            <Avatar className="h-8 w-8 border border-border">
+              <AvatarFallback className="bg-primary/20 text-primary text-xs">
+                {userEmail?.charAt(0).toUpperCase() || "U"}
+              </AvatarFallback>
+            </Avatar>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-56" align="end">
-            <DropdownMenuLabel className="font-normal">
-              <div className="flex flex-col space-y-1">
-                <p className="text-sm font-medium leading-none">Account</p>
-                <p className="text-xs leading-none text-muted-foreground">
-                  {userEmail}
-                </p>
-              </div>
-            </DropdownMenuLabel>
+            <DropdownMenuGroup>
+              <DropdownMenuLabel className="font-normal">
+                <div className="flex flex-col space-y-1">
+                  <p className="text-sm font-medium leading-none">Account</p>
+                  <p className="text-xs leading-none text-muted-foreground">
+                    {userEmail}
+                  </p>
+                </div>
+              </DropdownMenuLabel>
+            </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={() => router.push("/settings")}>
               Settings

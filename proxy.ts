@@ -9,7 +9,7 @@ import { updateSession } from "@/lib/supabase/middleware";
  * 2. Protect app routes — redirect unauthenticated users to /login.
  * 3. Redirect authenticated users away from auth pages.
  */
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Refresh session and get current user
