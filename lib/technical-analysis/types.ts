@@ -79,8 +79,8 @@ export interface ChartPattern {
 }
 
 export interface SetupScoreResult {
-  total: number; // 0–100
-  breakdown: {
+  total: number | null; // 0–100, or null if scoring is bypassed for NO_TRADE
+  breakdown?: {
     trendAlignment: number;
     marketStructure: number;
     entryLocation: number;
@@ -90,6 +90,8 @@ export interface SetupScoreResult {
     multiTimeframe: number;
   };
   notes: string[]; // plain-English notes per category (fed to AI as context)
+  isHeuristicScore: true; // Emphasize this is NOT a probability of winning
+  noTradeReason?: string; // Why the scoring was bypassed if total is null
 }
 
 export interface TAResult {

@@ -9,6 +9,7 @@ const config: Config = {
   moduleNameMapper: {
     // Allow the test file's relative imports to resolve from the trading-analyst dir
     '^(\\.\\./\\.\\./trading-analyst/)(.*)$': '<rootDir>/$2',
+    '^(\\.\\./\\.\\./lib/)(.*)$': '<rootDir>/lib/$2',
   },
   transform: {
     '^.+\\.ts$': ['ts-jest', {

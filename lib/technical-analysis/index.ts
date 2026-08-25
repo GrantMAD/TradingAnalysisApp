@@ -95,10 +95,8 @@ export async function runTechnicalAnalysis(params: {
   const candlestickPatterns = detectCandlestickPatterns(candles);
   const chartPatterns = detectChartPatterns(swings, levels);
 
-  // 5. Setup Score (If direction is proposed, otherwise undefined)
-  const setupScore = proposedDirection 
-    ? calculateSetupScore(proposedDirection, currentPrice, trend, structure, levels, indicators, hasVolume, 2.0, higherTimeframeContext?.trend)
-    : undefined;
+  // 5. Setup Score (Now calculated externally after Phase 6 and Phase 7)
+  const setupScore = undefined;
 
   // Assemble the result
   return {
