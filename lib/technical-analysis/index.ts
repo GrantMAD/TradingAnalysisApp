@@ -21,6 +21,11 @@ import { detectChartPatterns } from './patterns/chart-patterns';
 import { calculateSetupScore } from './scoring/setup-score';
 
 export * from './types';
+export * from './patterns/candlestick-patterns';
+export * from './patterns/chart-patterns';
+export * from './scoring/setup-score';
+export * from './setup/types';
+export * from './setup/evaluator';
 
 /**
  * Orchestrates the full Technical Analysis process.
