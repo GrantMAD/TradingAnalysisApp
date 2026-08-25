@@ -26,6 +26,12 @@ export * from './patterns/chart-patterns';
 export * from './scoring/setup-score';
 export * from './setup/types';
 export * from './setup/evaluator';
+// Phase 7 — Trade-Level Calculation
+// Note: calculateTradeLevels is NOT called inside runTechnicalAnalysis.
+// It must be invoked explicitly by the analysis pipeline after evaluateSetup().
+export * from './trade-levels/types';
+export * from './trade-levels/calculator';
+export * from './trade-levels/risk-reward';
 
 /**
  * Orchestrates the full Technical Analysis process.
