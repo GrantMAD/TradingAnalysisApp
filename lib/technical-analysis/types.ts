@@ -117,5 +117,5 @@ export interface MultiTimeframeContext {
 
 export interface UserSettings {
   // Placeholder for user settings like preferred indicator periods if needed
-  [key: string]: any;
+  [key: string]: unknown;
 }

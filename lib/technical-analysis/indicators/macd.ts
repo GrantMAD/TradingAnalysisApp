@@ -46,7 +46,7 @@ export function calculateMACD(
 
   // Calculate Signal line which is EMA of MACD line
   // The first Signal line value is an SMA of the first 'signal' MACD values
-  let macdStartIndex = slow - 1;
+  const macdStartIndex = slow - 1;
   if (macdStartIndex + signal > candles.length) {
       return result;
   }
@@ -57,7 +57,7 @@ export function calculateMACD(
   }
   
   let signalEma = sum / signal;
-  let signalIndex = macdStartIndex + signal - 1;
+  const signalIndex = macdStartIndex + signal - 1;
   
   result[signalIndex].signal = signalEma;
   result[signalIndex].histogram = (result[signalIndex].macd as number) - signalEma;

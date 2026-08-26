@@ -79,7 +79,7 @@ export function evaluateTrend(
 
   // Determine final direction and strength
   let direction: TrendResult['direction'] = 'neutral';
-  let strength = Math.min(100, Math.abs(score)); // Normalize to 0-100
+  const strength = Math.min(100, Math.abs(score)); // Normalize to 0-100
 
   if (score >= 60) {
     direction = 'strongly_bullish';

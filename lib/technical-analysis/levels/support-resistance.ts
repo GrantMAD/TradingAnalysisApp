@@ -18,7 +18,7 @@ export function identifySupportResistance(
   }
 
   const threshold = atr * 0.3;
-  let rawLevels = swings.map(s => s.price);
+  const rawLevels = swings.map(s => s.price);
 
   // Group nearby levels
   const clusters: { prices: number[], avg: number }[] = [];

@@ -47,7 +47,7 @@ export async function GET(request: NextRequest) {
 
     const result = await marketDataService.getCandles({
       symbol: parsedQuery.data.symbol,
-      timeframe: parsedQuery.data.timeframe as any,
+      timeframe: parsedQuery.data.timeframe as import('../../../../lib/market-data/types').Timeframe,
       limit: parsedQuery.data.limit,
       start: parsedQuery.data.start,
       end: parsedQuery.data.end

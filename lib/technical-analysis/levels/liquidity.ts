@@ -58,7 +58,7 @@ export function identifyLiquidityZones(
   const lastCandle = candles[candles.length - 1];
   const currentDay = new Date(lastCandle.time * 1000).getUTCDate();
   
-  let prevDayCandles: Candle[] = [];
+  const prevDayCandles: Candle[] = [];
   let foundPrevDay = false;
   let prevDay = -1;
 

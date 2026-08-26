@@ -131,6 +131,7 @@ export function ChartContainer({ levels = [], className = '' }: ChartContainerPr
 
   // Re-fetch on symbol / timeframe change
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchCandles(symbol, timeframe);
     fetchPrice(symbol);
   }, [symbol, timeframe, fetchCandles, fetchPrice]);
