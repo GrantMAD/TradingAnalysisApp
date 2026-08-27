@@ -44,7 +44,7 @@ export async function callAI(
   let rawText: string;
 
   try {
-    const parts: any[] = [{ text: userPrompt }];
+    const parts: Array<{ text: string } | { inlineData: { data: string; mimeType: string } }> = [{ text: userPrompt }];
     
     if (screenshot) {
       parts.push({

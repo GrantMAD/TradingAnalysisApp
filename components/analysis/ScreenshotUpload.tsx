@@ -71,9 +71,10 @@ export function ScreenshotUpload({ onUploadComplete, onUploadStart, onError }: S
       }
 
       onUploadComplete?.(filePath);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Upload failed:', err);
-      onError?.(err.message || 'Failed to upload screenshot');
+      const message = err instanceof Error ? err.message : String(err);
+      onError?.(message || 'Failed to upload screenshot');
       setPreviewUrl(null);
     } finally {
       setIsUploading(false);

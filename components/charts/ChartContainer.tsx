@@ -48,9 +48,12 @@ interface ChartContainerProps {
   /** Optional overlay levels (entry, SL, TP) injected from parent when an analysis exists */
   levels?: ChartLevel[];
   className?: string;
+  /** Optional callbacks so the parent can lift selected instrument/timeframe */
+  onInstrumentChange?: (instrument: Instrument | null) => void;
+  onTimeframeChange?: (tf: Timeframe) => void;
 }
 
-export function ChartContainer({ levels = [], className = '' }: ChartContainerProps) {
+export function ChartContainer({ levels = [], className = '', onInstrumentChange, onTimeframeChange }: ChartContainerProps) {
   const [instruments, setInstruments] = useState<Instrument[]>([]);
   const [symbol,      setSymbol]      = useState<string>(DEFAULT_SYMBOL);
   const [timeframe,   setTimeframe]   = useState<Timeframe>(DEFAULT_TIMEFRAME);
@@ -142,6 +145,19 @@ export function ChartContainer({ levels = [], className = '' }: ChartContainerPr
     fetchPrice(symbol);
   }, [symbol, timeframe, fetchCandles, fetchPrice]);
 
+  // Notify parent of symbol change so it can update RunAnalysisButton props
+  const handleSymbolChange = useCallback((newSymbol: string) => {
+    setSymbol(newSymbol);
+    const inst = instruments.find(i => i.symbol === newSymbol) ?? null;
+    onInstrumentChange?.(inst);
+  }, [instruments, onInstrumentChange]);
+
+  // Notify parent of timeframe change
+  const handleTimeframeChange = useCallback((tf: Timeframe) => {
+    setTimeframe(tf);
+    onTimeframeChange?.(tf);
+  }, [onTimeframeChange]);
+
   return (
     <div className={`flex flex-col rounded-xl border border-border/60 overflow-hidden glass ${className}`}>
       <ChartToolbar
@@ -150,8 +166,8 @@ export function ChartContainer({ levels = [], className = '' }: ChartContainerPr
         selectedTimeframe={timeframe}
         currentPrice={price}
         isLoading={isLoading}
-        onSymbolChange={setSymbol}
-        onTimeframeChange={setTimeframe}
+        onSymbolChange={handleSymbolChange}
+        onTimeframeChange={handleTimeframeChange}
         onRefresh={handleRefresh}
       />
 

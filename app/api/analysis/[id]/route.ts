@@ -56,6 +56,7 @@ export async function GET(
       summary,
       detailed_explanation,
       invalidation_conditions,
+      screenshot_path,
       ai_model,
       methodology_version,
       requested_at,

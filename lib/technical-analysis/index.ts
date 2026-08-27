@@ -50,8 +50,8 @@ export async function runTechnicalAnalysis(params: {
   const { candles, currentPrice, userSettings, higherTimeframeContext, proposedDirection } = params;
 
   // 1. Calculate Indicators
-  const rsi = calculateRSI(candles, userSettings.rsiPeriod || 14);
-  const macd = calculateMACD(candles, userSettings.macdFast || 12, userSettings.macdSlow || 26, userSettings.macdSignal || 9);
+  const rsi = calculateRSI(candles, (userSettings.rsiPeriod as number) || 14);
+  const macd = calculateMACD(candles, (userSettings.macdFast as number) || 12, (userSettings.macdSlow as number) || 26, (userSettings.macdSignal as number) || 9);
   const sma20 = calculateSMA(candles, 20);
   const sma50 = calculateSMA(candles, 50);
   const sma200 = calculateSMA(candles, 200);
@@ -81,7 +81,7 @@ export async function runTechnicalAnalysis(params: {
   const hasVolume = !vwapResult.reason;
 
   // 2. Structure Analysis
-  const swings = detectSwingPoints(candles, userSettings.swingLookback || 3);
+  const swings = detectSwingPoints(candles, (userSettings.swingLookback as number) || 3);
   const structure = analyseMarketStructure(swings, candles);
   const trend = evaluateTrend(candles, structure, indicators, higherTimeframeContext);
 
