@@ -24,7 +24,11 @@ export const METHODOLOGY_VERSION = '1.0';
  * Returns the system prompt that defines the AI's role and constraints.
  * This is sent as the "system" message in every AI call.
  */
-export function buildSystemPrompt(): string {
+export function buildSystemPrompt(hasScreenshot: boolean = false): string {
+  const screenshotInstruction = hasScreenshot 
+    ? `\n8. **Treat the screenshot strictly as supplementary evidence.** If your visual interpretation of the screenshot conflicts with the provided OHLCV structured data, you MUST clearly flag the conflict, you must NOT silently choose one, and you MUST prefer the structured market data for numerical values. You must never infer an exact price from the screenshot when reliable structured data is provided. Never claim that visual patterns seen in the screenshot guarantee profitability.` 
+    : '';
+
   return `You are an AI trading analyst integrated into a personal market-analysis application.
 
 ## Your role
@@ -45,7 +49,7 @@ You are a DECISION-SUPPORT tool. You do NOT execute trades, place orders, or con
 
 6. **Flag stale data.** If the input indicates dataIsStale is true, you must include a warning in warnings[] stating that the data may not reflect current market conditions and that no trade recommendation should be acted upon without verifying current prices.
 
-7. **This is personal decision-support only.** Never reference execution, brokerage, order placement, or automated trading in your output.
+7. **This is personal decision-support only.** Never reference execution, brokerage, order placement, or automated trading in your output.${screenshotInstruction}
 
 ## Output format
 You must return a single valid JSON object matching exactly this schema:

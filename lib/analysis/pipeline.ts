@@ -245,11 +245,30 @@ export async function runAnalysisPipeline(
     }
 
     // ─── Step 13: Build prompts ────────────────────────────────────────────
-    const systemPrompt = buildSystemPrompt();
+    const systemPrompt = buildSystemPrompt(!!params.screenshotPath);
     const userPrompt = buildUserPrompt(contextPkg);
 
+    // ─── Fetch Screenshot if provided ─────────────────────────────────────
+    let screenshotData: { base64: string; mimeType: string } | undefined = undefined;
+    if (params.screenshotPath) {
+      const { data: fileData, error: downloadError } = await supabase.storage
+        .from('chart-screenshots')
+        .download(params.screenshotPath);
+        
+      if (!downloadError && fileData) {
+        const buffer = await fileData.arrayBuffer();
+        const base64 = Buffer.from(buffer).toString('base64');
+        screenshotData = {
+          base64,
+          mimeType: fileData.type || 'image/jpeg'
+        };
+      } else {
+        console.warn(`Failed to download screenshot: ${downloadError?.message}`);
+      }
+    }
+
     // ─── Step 14: Call AI (Rule 1 — API key server-side only) ─────────────
-    const { rawText, modelUsed } = await callAI(systemPrompt, userPrompt);
+    const { rawText, modelUsed } = await callAI(systemPrompt, userPrompt, screenshotData);
 
     // ─── Step 15: Store raw AI response (Rule 12 — audit trail) ───────────
     await supabase

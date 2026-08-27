@@ -30,6 +30,7 @@ const MAX_OUTPUT_TOKENS = 4096;
 export async function callAI(
   systemPrompt: string,
   userPrompt: string,
+  screenshot?: { base64: string; mimeType: string },
 ): Promise<{ rawText: string; modelUsed: string }> {
   const apiKey = process.env.AI_API_KEY;
   const modelId = process.env.AI_MODEL || 'gemini-2.0-flash';
@@ -43,12 +44,23 @@ export async function callAI(
   let rawText: string;
 
   try {
+    const parts: any[] = [{ text: userPrompt }];
+    
+    if (screenshot) {
+      parts.push({
+        inlineData: {
+          data: screenshot.base64,
+          mimeType: screenshot.mimeType,
+        },
+      });
+    }
+
     const response = await client.models.generateContent({
       model: modelId,
       contents: [
         {
           role: 'user',
-          parts: [{ text: userPrompt }],
+          parts,
         },
       ],
       config: {

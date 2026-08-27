@@ -199,6 +199,7 @@ export interface AnalysisPipelineParams {
   marketType: MarketType;
   timeframe: Timeframe;
   userPreferences: AIUserPreferences;
+  screenshotPath?: string;
 }
 
 export interface AnalysisPipelineResult {

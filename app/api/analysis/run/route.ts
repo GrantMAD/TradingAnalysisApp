@@ -29,6 +29,7 @@ const RunAnalysisBodySchema = z.object({
   displayName: z.string().min(1, 'displayName is required'),
   marketType: z.enum(['crypto', 'forex']),
   timeframe: z.enum(VALID_TIMEFRAMES),
+  screenshotPath: z.string().optional(),
   userPreferences: z
     .object({
       riskProfile: z.enum(VALID_RISK_PROFILES).default('balanced'),
@@ -72,7 +73,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const { instrumentId, symbol, displayName, marketType, timeframe, userPreferences } =
+  const { instrumentId, symbol, displayName, marketType, timeframe, userPreferences, screenshotPath } =
     parsed.data;
 
   // ─── Run pipeline ─────────────────────────────────────────────────────────
@@ -84,6 +85,7 @@ export async function POST(request: NextRequest) {
     marketType,
     timeframe,
     userPreferences,
+    screenshotPath,
   });
 
   if (result.status === 'failed') {
