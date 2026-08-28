@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { Timeframe, Instrument } from '@/lib/market-data/types';
 import { ChartContainer } from '@/components/charts/ChartContainer';
 import { ChartLevel } from '@/components/charts/usePriceChart';
@@ -90,17 +90,25 @@ export default function AnalyzePage() {
 
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
   const [chartLevels, setChartLevels] = useState<ChartLevel[]>([]);
+  const [screenshotRequest, setScreenshotRequest] = useState(0);
+  const [generatedChartPreviewUrl, setGeneratedChartPreviewUrl] = useState<string | null>(null);
+  const [snapshotStatus, setSnapshotStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+  const snapshotAnalysisIdRef = useRef<string | null>(null);
 
   const handleInstrumentChange = useCallback((instrument: Instrument | null) => {
     setSelectedInstrument(instrument as DBInstrument | null);
     setAnalysisResult(null);
     setChartLevels([]);
+    setGeneratedChartPreviewUrl(null);
+    setSnapshotStatus('idle');
   }, []);
 
   const handleTimeframeChange = useCallback((tf: Timeframe) => {
     setSelectedTimeframe(tf);
     setAnalysisResult(null);
     setChartLevels([]);
+    setGeneratedChartPreviewUrl(null);
+    setSnapshotStatus('idle');
   }, []);
 
   const handleAnalysisComplete = useCallback(async (analysisId: string) => {
@@ -110,8 +118,48 @@ export default function AnalyzePage() {
       const data: AnalysisResult = await res.json();
       setAnalysisResult(data);
       setChartLevels(buildChartLevels(data.tradeSetup));
+      snapshotAnalysisIdRef.current = analysisId;
+      setSnapshotStatus('saving');
+      setScreenshotRequest((request) => request + 1);
     } catch {
       // RunAnalysisButton already handled error display
+    }
+  }, []);
+
+  const handleChartScreenshot = useCallback(async (canvas: HTMLCanvasElement) => {
+    const analysisId = snapshotAnalysisIdRef.current;
+    if (!analysisId) return;
+
+    const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/png'));
+    if (!blob) {
+      setSnapshotStatus('error');
+      return;
+    }
+
+    const localPreviewUrl = URL.createObjectURL(blob);
+    setGeneratedChartPreviewUrl((previousUrl) => {
+      if (previousUrl?.startsWith('blob:')) URL.revokeObjectURL(previousUrl);
+      return localPreviewUrl;
+    });
+
+    const formData = new FormData();
+    formData.append('image', blob, 'analysis-chart.png');
+    try {
+      const response = await fetch(`/api/analysis/${analysisId}/snapshot`, {
+        method: 'POST',
+        body: formData,
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error ?? 'Could not save chart snapshot.');
+      if (result.signedUrl) {
+        setGeneratedChartPreviewUrl((previousUrl) => {
+          if (previousUrl?.startsWith('blob:')) URL.revokeObjectURL(previousUrl);
+          return result.signedUrl;
+        });
+      }
+      setSnapshotStatus('saved');
+    } catch {
+      setSnapshotStatus('error');
     }
   }, []);
 
@@ -197,6 +245,8 @@ export default function AnalyzePage() {
       <ChartContainer
         className="flex-none min-h-120"
         levels={chartLevels}
+        onScreenshot={handleChartScreenshot}
+        screenshotRequest={screenshotRequest}
         onInstrumentChange={handleInstrumentChange}
         onTimeframeChange={handleTimeframeChange}
       />
@@ -212,7 +262,10 @@ export default function AnalyzePage() {
             tradeSetup={analysisResult.tradeSetup}
             evidence={analysisResult.evidence}
             marketSnapshot={analysisResult.marketSnapshot}
+            generatedChartPreviewUrl={generatedChartPreviewUrl}
           />
+          {snapshotStatus === 'saving' && <p className="mt-3 text-xs text-muted-foreground">Saving generated analysis chart...</p>}
+          {snapshotStatus === 'error' && <p className="mt-3 text-xs text-destructive">The analysis completed, but the generated chart could not be saved.</p>}
         </div>
       )}
     </div>

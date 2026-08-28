@@ -10,7 +10,7 @@ import { formatMarketTimestamp } from '@/lib/market-data/timestamps';
 
 const DEFAULT_SYMBOL    = 'BTC/USD';
 const DEFAULT_TIMEFRAME: Timeframe = '1h';
-const DEFAULT_LIMIT     = 200;
+const DEFAULT_LIMIT     = 300;
 
 // ── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -43,9 +43,11 @@ interface ChartContainerProps {
   /** Optional callbacks so the parent can lift selected instrument/timeframe */
   onInstrumentChange?: (instrument: Instrument | null) => void;
   onTimeframeChange?: (tf: Timeframe) => void;
+  onScreenshot?: (canvas: HTMLCanvasElement) => void;
+  screenshotRequest?: number;
 }
 
-export function ChartContainer({ levels = [], className = '', onInstrumentChange, onTimeframeChange }: ChartContainerProps) {
+export function ChartContainer({ levels = [], className = '', onInstrumentChange, onTimeframeChange, onScreenshot, screenshotRequest = 0 }: ChartContainerProps) {
   const [instruments, setInstruments] = useState<Instrument[]>([]);
   const [symbol,      setSymbol]      = useState<string>(DEFAULT_SYMBOL);
   const [timeframe,   setTimeframe]   = useState<Timeframe>(DEFAULT_TIMEFRAME);
@@ -176,6 +178,8 @@ export function ChartContainer({ levels = [], className = '', onInstrumentChange
         isLoading={isLoading}
         isStale={isStale}
         dataAsOf={dataAsOf}
+        onScreenshot={onScreenshot}
+        screenshotRequest={screenshotRequest}
         className="flex-1"
       />
     </div>

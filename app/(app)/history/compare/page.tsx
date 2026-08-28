@@ -30,6 +30,7 @@ async function getAnalysisData(supabase: SupabaseClient, id: string, userId: str
       detailed_explanation,
       invalidation_conditions,
       screenshot_path,
+      generated_chart_path,
       ai_model,
       methodology_version,
       requested_at,
@@ -64,12 +65,21 @@ async function getAnalysisData(supabase: SupabaseClient, id: string, userId: str
     screenshotPreviewUrl = data?.signedUrl || null;
   }
 
+  let generatedChartPreviewUrl: string | null = null;
+  if (analysis.generated_chart_path) {
+    const { data } = await supabase.storage
+      .from('chart-screenshots')
+      .createSignedUrl(analysis.generated_chart_path, 3600);
+    generatedChartPreviewUrl = data?.signedUrl || null;
+  }
+
   return {
     analysis,
     tradeSetup: tradeSetup || null,
     evidence: evidence || [],
     marketSnapshot: marketSnapshot || null,
     screenshotPreviewUrl
+    , generatedChartPreviewUrl
   };
 }
 
@@ -133,6 +143,7 @@ export default async function HistoryComparePage({
             evidence={data1.evidence} 
             marketSnapshot={data1.marketSnapshot}
             screenshotPreviewUrl={data1.screenshotPreviewUrl} 
+            generatedChartPreviewUrl={data1.generatedChartPreviewUrl}
           />
         </div>
 
@@ -148,6 +159,7 @@ export default async function HistoryComparePage({
             evidence={data2.evidence} 
             marketSnapshot={data2.marketSnapshot}
             screenshotPreviewUrl={data2.screenshotPreviewUrl} 
+            generatedChartPreviewUrl={data2.generatedChartPreviewUrl}
           />
         </div>
       </div>

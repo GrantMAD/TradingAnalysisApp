@@ -49,6 +49,7 @@ interface AnalysisPanelProps {
   evidence: EvidenceItem[];
   marketSnapshot: MarketSnapshot | null;
   screenshotPreviewUrl?: string | null;
+  generatedChartPreviewUrl?: string | null;
   userMinimumRR?: number;
 }
 
@@ -73,6 +74,7 @@ export function AnalysisPanel({
   evidence,
   marketSnapshot,
   screenshotPreviewUrl,
+  generatedChartPreviewUrl,
   userMinimumRR = 2.0,
 }: AnalysisPanelProps) {
   const { explanation, warnings } = parseWarnings(analysis.detailed_explanation);
@@ -147,8 +149,19 @@ export function AnalysisPanel({
           <img
             src={screenshotPreviewUrl}
             alt="Uploaded chart screenshot"
-            className="w-full h-auto max-h-[400px] object-contain bg-background"
+            className="w-full h-auto max-h-100 object-contain bg-background"
           />
+        </div>
+      )}
+
+      {generatedChartPreviewUrl && (
+        <div className="rounded-xl border border-border/50 overflow-hidden">
+          <div className="flex items-center gap-2 px-4 py-2.5 border-b border-border/40 bg-card/60 text-xs text-muted-foreground">
+            <ImageIcon className="w-3.5 h-3.5" />
+            Generated Analysis Chart
+          </div>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={generatedChartPreviewUrl} alt="Generated analysis chart with setup levels" className="w-full h-auto object-contain bg-background" />
         </div>
       )}
 

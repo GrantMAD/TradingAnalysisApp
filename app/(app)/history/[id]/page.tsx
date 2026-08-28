@@ -42,6 +42,7 @@ export default async function HistoryDetailPage({
       detailed_explanation,
       invalidation_conditions,
       screenshot_path,
+      generated_chart_path,
       ai_model,
       methodology_version,
       requested_at,
@@ -77,6 +78,14 @@ export default async function HistoryDetailPage({
     screenshotPreviewUrl = data?.signedUrl || null;
   }
 
+  let generatedChartPreviewUrl: string | null = null;
+  if (analysis.generated_chart_path) {
+    const { data } = await supabase.storage
+      .from('chart-screenshots')
+      .createSignedUrl(analysis.generated_chart_path, 3600);
+    generatedChartPreviewUrl = data?.signedUrl || null;
+  }
+
   return (
     <div className="container mx-auto py-8 space-y-6">
       <div className="flex items-center justify-between">
@@ -104,6 +113,7 @@ export default async function HistoryDetailPage({
           evidence={evidence || []} 
           marketSnapshot={marketSnapshot || null}
           screenshotPreviewUrl={screenshotPreviewUrl} 
+          generatedChartPreviewUrl={generatedChartPreviewUrl}
         />
       </div>
     </div>

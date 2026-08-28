@@ -57,6 +57,7 @@ export async function GET(
       detailed_explanation,
       invalidation_conditions,
       screenshot_path,
+      generated_chart_path,
       ai_model,
       methodology_version,
       requested_at,

@@ -5,6 +5,7 @@ import { CandlestickData, HistogramData, Time } from 'lightweight-charts';
 import { usePriceChart, ChartLevel } from './usePriceChart';
 import { Loader2 } from 'lucide-react';
 import { LiveLocalTime } from '@/components/ui/LiveLocalTime';
+import { useEffect } from 'react';
 
 interface PriceChartProps {
   candles: CandlestickData<Time>[];
@@ -14,6 +15,8 @@ interface PriceChartProps {
   isStale?: boolean;
   dataAsOf?: string;
   className?: string;
+  onScreenshot?: (canvas: HTMLCanvasElement) => void;
+  screenshotRequest?: number;
 }
 
 export function PriceChart({
@@ -24,10 +27,21 @@ export function PriceChart({
   isStale = false,
   dataAsOf,
   className = '',
+  onScreenshot,
+  screenshotRequest = 0,
 }: PriceChartProps) {
   const containerRef = useRef<HTMLDivElement>(null);
 
-  usePriceChart({ containerRef, candles, volumes, levels });
+  const { takeScreenshot } = usePriceChart({ containerRef, candles, volumes, levels });
+
+  useEffect(() => {
+    if (!screenshotRequest || !onScreenshot || !candles.length) return;
+    const frame = window.requestAnimationFrame(() => {
+      const canvas = takeScreenshot();
+      if (canvas) onScreenshot(canvas);
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [candles.length, onScreenshot, screenshotRequest, takeScreenshot]);
 
   return (
     <div className={`relative flex flex-col ${className}`}>

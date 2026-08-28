@@ -160,5 +160,41 @@ export function usePriceChart({ containerRef, candles, volumes, levels = [] }: U
     chartRef.current?.timeScale().fitContent();
   }, []);
 
-  return { fitContent };
+  const takeScreenshot = useCallback(() => {
+    if (!chartRef.current || !candles.length) return null;
+    const screenshot = chartRef.current.takeScreenshot();
+    const context = screenshot.getContext('2d');
+    if (!context) return screenshot;
+
+    const chartWidth = screenshot.width / window.devicePixelRatio;
+    const chartHeight = screenshot.height / window.devicePixelRatio;
+    context.save();
+    context.scale(window.devicePixelRatio, window.devicePixelRatio);
+    context.font = '600 12px sans-serif';
+    context.textBaseline = 'middle';
+
+    levels.forEach((level) => {
+      const coordinate = candleSeriesRef.current
+        ? candleSeriesRef.current.priceToCoordinate(level.price)
+        : null;
+      if (coordinate === null) return;
+
+      const y = Number(coordinate);
+      context.strokeStyle = level.color;
+      context.fillStyle = level.color;
+      context.lineWidth = level.lineWidth ?? 1;
+      context.setLineDash(level.lineStyle === LineStyle.Dashed ? [6, 4] : []);
+      context.beginPath();
+      context.moveTo(0, y);
+      context.lineTo(chartWidth, y);
+      context.stroke();
+      context.setLineDash([]);
+      context.fillText(level.label, Math.max(4, chartWidth - 42), Math.min(chartHeight - 12, Math.max(12, y)));
+    });
+
+    context.restore();
+    return screenshot;
+  }, [candles.length, levels]);
+
+  return { fitContent, takeScreenshot };
 }
