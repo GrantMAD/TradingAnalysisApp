@@ -49,10 +49,11 @@ These rules cover secrets management, database security, AI output integrity, tr
 | 6 | Setup Detection | ✅ Complete |
 | 7 | Trade-Level Calculation | ✅ Complete |
 | 8 | Scoring Engine | ✅ Complete |
-| 9 — AI Analysis Layer | ✅ COMPLETE |
-| 10 — Screenshot Analysis | ✅ COMPLETE |
-| 11 — Analysis UI | ✅ COMPLETE |
-| 12 — Analysis History | ✅ COMPLETE |
+| 9 | AI Analysis Layer | ✅ Complete |
+| 10 | Screenshot Analysis | ✅ Complete |
+| 11 | Analysis UI | ✅ Complete |
+| 12 | Analysis History | ✅ Complete |
+| 13 | User Settings | ✅ Implemented — manual verification pending |
 
 ## Phase: 12 — Analysis History
 ## Status: ✅ COMPLETE
@@ -61,7 +62,7 @@ These rules cover secrets management, database security, AI output integrity, tr
 | Check | Result |
 |-------|--------|
 | `npx tsc --noEmit` | ✅ 0 errors |
-| `npm run lint` | ✅ 0 errors (pre-existing warnings only) |
+| `npm run lint` | ⚠️ Existing errors remain in Phase 12 history files |
 | History list page | ✅ Implemented |
 | Analysis detail page | ✅ Implemented |
 | Compare mode page | ✅ Implemented |
@@ -114,6 +115,21 @@ These rules cover secrets management, database security, AI output integrity, tr
 | Rule 3 & 4 — User data isolation | `user_id` enforced both by Row Level Security and explicit defense-in-depth checks on the server. |
 | Rule 12 — Retain evidence | Detail views fetch the raw `market_snapshots`, `indicator_snapshots`, and `analysis_evidence` without modification. |
 | Rule 14 — Timestamps | `DataFreshnessBar` naturally displays original timestamps of the historical runs on the detail pages. |
+
+## Phase: 13 — User Settings
+## Status: ✅ IMPLEMENTED — MANUAL VERIFICATION PENDING
+
+Phase 13 adds an authenticated settings page and persistence API for:
+
+- Risk profile, risk per trade, and minimum risk/reward
+- Preferred timeframes and trading sessions
+- Multi-timeframe confirmation
+- Enabled technical-analysis components
+- Screenshot analysis availability
+
+Saved settings are validated server-side, scoped to the authenticated user through Supabase RLS, and loaded by analysis requests. The analysis route also enforces the screenshot preference server-side.
+
+Verification completed: TypeScript and focused Phase 13 lint pass. Manual persistence/RLS checks remain, and the full lint command still reports unrelated existing Phase 12 errors.
 
 ---
 

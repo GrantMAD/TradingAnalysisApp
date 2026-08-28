@@ -18,6 +18,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '../../../../lib/supabase/server';
 import { runAnalysisPipeline } from '../../../../lib/analysis/pipeline';
+import { DEFAULT_USER_SETTINGS, parseUserSettings } from '../../../../lib/user-settings';
 import { z } from 'zod';
 
 const VALID_TIMEFRAMES = ['1m', '5m', '15m', '1h', '4h', '1d'] as const;
@@ -73,8 +74,43 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const { instrumentId, symbol, displayName, marketType, timeframe, userPreferences, screenshotPath } =
+  const { instrumentId, symbol, displayName, marketType, timeframe, screenshotPath } =
     parsed.data;
+
+  const { data: savedSettings, error: settingsError } = await supabase
+    .from('user_settings')
+    .select('*')
+    .eq('user_id', user.id)
+    .maybeSingle();
+
+  if (settingsError) {
+    return NextResponse.json({ error: 'Could not load your analysis settings.' }, { status: 500 });
+  }
+
+  const settings = parseUserSettings(savedSettings) ?? DEFAULT_USER_SETTINGS;
+
+  if (screenshotPath && !settings.screenshot_analysis_enabled) {
+    return NextResponse.json(
+      { error: 'Screenshot analysis is disabled in your settings.' },
+      { status: 400 },
+    );
+  }
+
+  const userPreferences = {
+    riskProfile: settings.risk_profile,
+    minimumRR: settings.minimum_risk_reward,
+    requireMultiTimeframeConfirmation: settings.require_multi_timeframe_confirmation,
+    enabledComponents: [
+      settings.enable_market_structure && 'market_structure',
+      settings.enable_support_resistance && 'support_resistance',
+      settings.enable_momentum && 'momentum',
+      settings.enable_volume && 'volume',
+      settings.enable_price_action && 'price_action',
+      settings.enable_chart_patterns && 'chart_patterns',
+      settings.enable_liquidity_analysis && 'liquidity',
+      settings.enable_fibonacci && 'fibonacci',
+    ].filter((component): component is string => Boolean(component)),
+  };
 
   // ─── Run pipeline ─────────────────────────────────────────────────────────
   const result = await runAnalysisPipeline({

@@ -1,21 +1,37 @@
 import { Metadata } from "next";
+import { redirect } from 'next/navigation';
+import { SettingsForm } from '@/components/settings/SettingsForm';
+import { createClient } from '@/lib/supabase/server';
+import { DEFAULT_USER_SETTINGS, parseUserSettings } from '@/lib/user-settings';
 
 export const metadata: Metadata = {
   title: "Settings",
 };
 
-export default function SettingsPage() {
+export default async function SettingsPage() {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) redirect('/login');
+
+  const { data } = await supabase
+    .from('user_settings')
+    .select('*')
+    .eq('user_id', user.id)
+    .maybeSingle();
+
+  const settings = parseUserSettings(data) ?? DEFAULT_USER_SETTINGS;
+
   return (
-    <div className="max-w-4xl mx-auto">
-      <div className="glass p-12 rounded-2xl flex flex-col items-center justify-center text-center min-h-[400px] border-dashed border-2 border-border/50">
-        <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-6">
-          <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
-        </div>
-        <h2 className="text-2xl font-bold tracking-tight mb-3">User Settings</h2>
-        <p className="text-muted-foreground max-w-md">
-          This feature is scheduled for Phase 3/4. You will be able to manage your risk profile, preferred timeframes, and enabled analysis components here.
+    <div className="mx-auto max-w-5xl">
+      <div className="mb-7">
+        <p className="text-xs font-semibold uppercase tracking-widest text-primary">Preferences</p>
+        <h1 className="mt-2 text-2xl font-bold tracking-tight">User settings</h1>
+        <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
+          Configure the risk limits and evidence preferences used by your market analysis.
         </p>
       </div>
+      <SettingsForm initialSettings={settings} />
     </div>
   );
 }
