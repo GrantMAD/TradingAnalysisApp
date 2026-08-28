@@ -109,7 +109,11 @@ export function ScreenshotUpload({ onUploadComplete, onUploadStart, onError }: S
     return (
       <div className="relative rounded-lg overflow-hidden border border-border bg-card">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={previewUrl} alt="Chart Screenshot Preview" className="w-full h-auto max-h-[300px] object-contain bg-background" />
+        <img
+          src={previewUrl}
+          alt="Chart Screenshot Preview"
+          className="w-full h-auto max-h-75 object-contain bg-background"
+        />
         
         {isUploading ? (
           <div className="absolute inset-0 bg-background/50 backdrop-blur-sm flex flex-col items-center justify-center">
@@ -152,7 +156,7 @@ export function ScreenshotUpload({ onUploadComplete, onUploadStart, onError }: S
         <UploadCloud className="w-6 h-6 text-primary" />
       </div>
       <h3 className="text-sm font-semibold mb-1">Upload Chart Screenshot</h3>
-      <p className="text-xs text-muted-foreground mb-4 max-w-[200px]">
+      <p className="text-xs mb-4 max-w-50 text-muted-foreground">
         Drag & drop or click to upload. Max 5MB (PNG, JPEG, WebP).
       </p>
       <Button variant="outline" size="sm" type="button" onClick={(e) => { e.stopPropagation(); fileInputRef.current?.click(); }}>

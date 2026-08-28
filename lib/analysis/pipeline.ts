@@ -108,10 +108,14 @@ export async function runAnalysisPipeline(
   };
 
   // ─── Step 2: Mark as running ───────────────────────────────────────────────
-  await supabase
+  const { error: runningError } = await supabase
     .from('analyses')
     .update({ status: 'running', started_at: new Date().toISOString() })
     .eq('id', analysisId);
+
+  if (runningError) {
+    return fail(`Failed to mark analysis as running: ${runningError.message}`);
+  }
 
   try {
     // ─── Step 3: Fetch market data ─────────────────────────────────────────

@@ -195,7 +195,7 @@ export default function AnalyzePage() {
 
       {/* Live chart with level overlays */}
       <ChartContainer
-        className="flex-none min-h-[480px]"
+        className="flex-none min-h-120"
         levels={chartLevels}
         onInstrumentChange={handleInstrumentChange}
         onTimeframeChange={handleTimeframeChange}
@@ -204,7 +204,7 @@ export default function AnalyzePage() {
       {/* Analysis result panel */}
       {analysisResult && (
         <div className="glass rounded-xl p-5 border border-border/60">
-          <h2 className="text-base font-semibold mb-4 text-muted-foreground uppercase tracking-wider text-xs">
+          <h2 className="font-semibold mb-4 text-muted-foreground uppercase tracking-wider text-xs">
             Analysis Result — {symbol} / {selectedTimeframe.toUpperCase()}
           </h2>
           <AnalysisPanel
