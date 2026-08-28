@@ -4,6 +4,7 @@ import { useRef } from 'react';
 import { CandlestickData, HistogramData, Time } from 'lightweight-charts';
 import { usePriceChart, ChartLevel } from './usePriceChart';
 import { Loader2 } from 'lucide-react';
+import { LiveLocalTime } from '@/components/ui/LiveLocalTime';
 
 interface PriceChartProps {
   candles: CandlestickData<Time>[];
@@ -42,6 +43,9 @@ export function PriceChart({
             <span className="text-amber-400 font-medium">⚠ Stale data —&nbsp;</span>
           ) : null}
           <span>Data as of {dataAsOf}</span>
+          <span className="ml-auto border-l border-border/50 pl-2">
+            <LiveLocalTime />
+          </span>
         </div>
       )}
 

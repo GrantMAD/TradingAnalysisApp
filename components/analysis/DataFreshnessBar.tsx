@@ -1,6 +1,8 @@
 'use client';
 
 import { AlertTriangle, Clock } from 'lucide-react';
+import { formatMarketTimestamp } from '@/lib/market-data/timestamps';
+import { LiveLocalTime } from '@/components/ui/LiveLocalTime';
 
 interface DataFreshnessBarProps {
   dataAsOf: string | null;
@@ -9,15 +11,7 @@ interface DataFreshnessBarProps {
 }
 
 export function DataFreshnessBar({ dataAsOf, dataAgeMinutes, isStale }: DataFreshnessBarProps) {
-  const formatted = dataAsOf
-    ? new Date(dataAsOf).toLocaleString(undefined, {
-        month: 'short',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: false,
-      })
-    : 'Unknown';
+  const formatted = formatMarketTimestamp(dataAsOf);
 
   return (
     <div
@@ -43,6 +37,9 @@ export function DataFreshnessBar({ dataAsOf, dataAgeMinutes, isStale }: DataFres
           ⚠ Stale
         </span>
       )}
+      <span className="ml-auto border-l border-border/50 pl-2 text-muted-foreground">
+        <LiveLocalTime />
+      </span>
     </div>
   );
 }

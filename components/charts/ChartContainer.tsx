@@ -6,6 +6,7 @@ import { Timeframe, Instrument, Candle } from '@/lib/market-data/types';
 import { PriceChart } from './PriceChart';
 import { ChartToolbar } from './ChartToolbar';
 import { ChartLevel } from './usePriceChart';
+import { formatMarketTimestamp } from '@/lib/market-data/timestamps';
 
 const DEFAULT_SYMBOL    = 'BTC/USD';
 const DEFAULT_TIMEFRAME: Timeframe = '1h';
@@ -31,15 +32,6 @@ function toVolumeData(candles: Candle[]): HistogramData<Time>[] {
       ? 'rgba(34, 197, 94, 0.35)'   // bull green
       : 'rgba(239, 68, 68, 0.35)',   // bear red
   }));
-}
-
-function formatDataAsOf(isoString: string): string {
-  const d = new Date(isoString);
-  return d.toLocaleString(undefined, {
-    month: 'short', day: '2-digit',
-    hour: '2-digit', minute: '2-digit',
-    hour12: false,
-  });
 }
 
 // ── Component ────────────────────────────────────────────────────────────────
@@ -109,7 +101,7 @@ export function ChartContainer({ levels = [], className = '', onInstrumentChange
       setCandles(toCandlestickData(raw));
       setVolumes(toVolumeData(raw));
       setIsStale(json.quality?.isStale ?? false);
-      setDataAsOf(json.quality?.dataAsOf ? formatDataAsOf(json.quality.dataAsOf) : undefined);
+      setDataAsOf(json.quality?.dataAsOf ? formatMarketTimestamp(json.quality.dataAsOf) : undefined);
     } catch (e: unknown) {
       if (id !== fetchIdRef.current) return;
       const msg = e instanceof Error ? e.message : 'Unknown error';

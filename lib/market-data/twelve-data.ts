@@ -9,6 +9,7 @@ import {
   DataQuality 
 } from './types';
 import { MarketDataError } from './errors';
+import { parseProviderDateTime } from './timestamps';
 import { 
   TwelveDataTimeSeriesResponseSchema, 
   TwelveDataPriceResponseSchema 
@@ -57,6 +58,7 @@ export class TwelveDataProvider implements MarketDataProvider {
     url.searchParams.append('interval', tdInterval);
     url.searchParams.append('outputsize', request.limit.toString());
     url.searchParams.append('apikey', this.apiKey);
+    url.searchParams.append('timezone', 'UTC');
     
     // Add optional params
     if (request.start) {
@@ -104,24 +106,28 @@ export class TwelveDataProvider implements MarketDataProvider {
         };
       }
 
-      const candles: Candle[] = parsed.data.values.map(v => {
-        // TwelveData datetime is typically "2021-09-09 10:45:00" string
-        // Actually, Twelve Data returns in exchange timezone unless specified, so append timezone=UTC to request or parse properly
-        // Let's add timezone=UTC in URL above, wait, I didn't add it. I should assume it's exchange time, but for safety let's use Date.parse
-        const tStamp = new Date(v.datetime).getTime() / 1000;
-        
-        return {
-          timestamp: tStamp,
+      const candles: Candle[] = parsed.data.values.flatMap(v => {
+        const timestamp = parseProviderDateTime(v.datetime);
+        if (timestamp === null) return [];
+
+        const candle: Candle = {
+          timestamp,
           open: parseFloat(v.open),
           high: parseFloat(v.high),
           low: parseFloat(v.low),
           close: parseFloat(v.close),
-          volume: v.volume ? parseFloat(v.volume) : undefined
+          volume: v.volume ? parseFloat(v.volume) : undefined,
         };
-      }).filter(c => this.validateCandle(c));
+
+        return this.validateCandle(candle) ? [candle] : [];
+      });
 
       // Reverse so it's oldest to newest (Twelve data usually returns newest first)
       candles.reverse();
+
+      if (candles.length === 0) {
+        throw new MarketDataError('INVALID_RESPONSE', 'Provider returned no valid candle timestamps or prices');
+      }
 
       const latestCandle = candles[candles.length - 1];
       const dataAsOf = new Date(latestCandle.timestamp * 1000);
