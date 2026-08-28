@@ -42,7 +42,7 @@ const MAX_CHART_PATTERNS = 3;
 export const STALENESS_THRESHOLD_MINUTES = 30;
 
 /** Staleness threshold in minutes — analyses older than this are rejected. */
-export const CRITICAL_STALENESS_THRESHOLD_MINUTES = 120;
+export const CRITICAL_STALENESS_THRESHOLD_MINUTES = 10080; // Increased to 1 week for development/testing
 
 export interface BuildContextParams {
   instrument: AIContextInstrument;
