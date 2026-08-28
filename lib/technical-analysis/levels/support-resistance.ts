@@ -1,4 +1,4 @@
-import { Level, SwingPoint, Candle } from '../types';
+import { Level, SwingPoint } from '../types';
 
 /**
  * Identifies high-quality Support and Resistance zones.

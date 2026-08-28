@@ -106,7 +106,6 @@ export class TwelveDataProvider implements MarketDataProvider {
 
       const candles: Candle[] = parsed.data.values.map(v => {
         // TwelveData datetime is typically "2021-09-09 10:45:00" string
-        const ts = new Date(v.datetime + 'Z').getTime() / 1000; // Force UTC if needed, or rely on parsing
         // Actually, Twelve Data returns in exchange timezone unless specified, so append timezone=UTC to request or parse properly
         // Let's add timezone=UTC in URL above, wait, I didn't add it. I should assume it's exchange time, but for safety let's use Date.parse
         const tStamp = new Date(v.datetime).getTime() / 1000;

@@ -5,6 +5,7 @@ import { AnalysisPanel } from '../../../../components/analysis/AnalysisPanel';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '../../../../components/ui/button';
+import { normalizeHistoryInstrument } from '../../../../components/history/types';
 
 export const metadata: Metadata = {
   title: "Analysis Details - AI Trading Analyst",
@@ -88,7 +89,7 @@ export default async function HistoryDetailPage({
           <div>
             <h1 className="text-2xl font-bold tracking-tight">Analysis Details</h1>
             <p className="text-muted-foreground text-sm flex gap-2 items-center">
-              <span>{(analysis.instrument as any)?.symbol}</span>
+              <span>{normalizeHistoryInstrument(analysis.instrument)?.symbol}</span>
               <span>•</span>
               <span className="uppercase">{analysis.timeframe}</span>
             </p>

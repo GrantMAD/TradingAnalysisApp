@@ -3,6 +3,7 @@ import { createClient } from '../../../lib/supabase/server';
 import { HistoryList } from '../../../components/history/HistoryList';
 import { HistoryFilters } from '../../../components/history/HistoryFilters';
 import { redirect } from 'next/navigation';
+import { normalizeHistoryInstrument, type HistoryAnalysis } from '../../../components/history/types';
 
 export const metadata: Metadata = {
   title: "History - AI Trading Analyst",
@@ -74,7 +75,7 @@ export default async function HistoryPage({
     <div className="container mx-auto py-8 space-y-6">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">Analysis History</h1>
+          <h1 className="bg-linear-to-r from-primary to-primary/60 bg-clip-text text-3xl font-bold tracking-tight text-transparent">Analysis History</h1>
           <p className="text-muted-foreground mt-1">Review, filter, and compare past trade setups.</p>
         </div>
       </div>
@@ -85,7 +86,14 @@ export default async function HistoryPage({
         <HistoryFilters />
       </div>
       
-      <HistoryList initialAnalyses={(analyses as any) || []} totalCount={count || 0} currentPage={page} />
+      <HistoryList
+        initialAnalyses={((analyses ?? []).map((analysis) => ({
+          ...analysis,
+          instrument: normalizeHistoryInstrument(analysis.instrument),
+        })) as unknown) as HistoryAnalysis[]}
+        totalCount={count || 0}
+        currentPage={page}
+      />
     </div>
   );
 }

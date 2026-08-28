@@ -4,10 +4,10 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { HistoryAnalysis } from './types';
-import { formatDistanceToNow, format } from 'date-fns';
+import { formatDistanceToNow } from 'date-fns';
 import { Button } from '../ui/button';
 import { Checkbox } from '../ui/checkbox';
-import { ArrowRight, BarChart2, Calendar, Clock, GitCompare } from 'lucide-react';
+import { ArrowRight, BarChart2, Clock, GitCompare } from 'lucide-react';
 import { Badge } from '../ui/badge';
 import { DecisionBadge } from '../analysis/DecisionBadge';
 
@@ -45,13 +45,13 @@ export function HistoryList({ initialAnalyses, totalCount, currentPage }: Histor
 
   if (!initialAnalyses || initialAnalyses.length === 0) {
     return (
-      <div className="glass p-12 rounded-2xl flex flex-col items-center justify-center text-center min-h-[300px] border-dashed border-2 border-border/50">
+      <div className="glass flex min-h-75 flex-col items-center justify-center rounded-2xl border-2 border-dashed border-border/50 p-12 text-center">
         <div className="w-16 h-16 rounded-full bg-primary/5 flex items-center justify-center text-muted-foreground mb-4">
           <BarChart2 className="w-8 h-8 opacity-50" />
         </div>
         <h3 className="text-xl font-semibold mb-2">No analyses found</h3>
         <p className="text-muted-foreground max-w-sm">
-          We couldn't find any historical analyses matching your current filters. Try adjusting them or run a new analysis.
+          We couldn&apos;t find any historical analyses matching your current filters. Try adjusting them or run a new analysis.
         </p>
       </div>
     );
@@ -68,7 +68,7 @@ export function HistoryList({ initialAnalyses, totalCount, currentPage }: Histor
               className={`glass p-5 rounded-xl border transition-all duration-200 group flex flex-col md:flex-row items-start md:items-center gap-4 ${isSelected ? 'border-primary shadow-[0_0_15px_rgba(var(--primary),0.15)] bg-primary/5' : 'border-border/50 hover:border-border hover:shadow-md hover:-translate-y-0.5'}`}
             >
               {/* Checkbox for Compare */}
-              <div className="flex-shrink-0 pt-1 md:pt-0">
+              <div className="shrink-0 pt-1 md:pt-0">
                 <Checkbox 
                   checked={isSelected}
                   onCheckedChange={(c: boolean | string) => handleSelect(analysis.id, !!c)}
@@ -79,7 +79,7 @@ export function HistoryList({ initialAnalyses, totalCount, currentPage }: Histor
 
               {/* Core Info */}
               <div className="flex-1 flex flex-col md:flex-row gap-4 md:gap-6 items-start md:items-center w-full">
-                <div className="flex-shrink-0 flex items-center gap-3">
+                <div className="flex shrink-0 items-center gap-3">
                   <div className="w-10 h-10 rounded-lg bg-background border border-border/50 flex flex-col items-center justify-center">
                     <span className="text-xs font-semibold">{analysis.instrument?.symbol.split('/')[0] || '---'}</span>
                     <span className="text-[9px] text-muted-foreground uppercase">{analysis.timeframe}</span>
@@ -118,7 +118,7 @@ export function HistoryList({ initialAnalyses, totalCount, currentPage }: Histor
               </div>
 
               {/* Action Button */}
-              <div className="flex-shrink-0 w-full md:w-auto mt-2 md:mt-0 flex justify-end">
+              <div className="mt-2 flex w-full shrink-0 justify-end md:mt-0 md:w-auto">
                 <Link href={`/history/${analysis.id}`} className="w-full md:w-auto">
                   <Button 
                     variant={isSelected ? "default" : "secondary"}

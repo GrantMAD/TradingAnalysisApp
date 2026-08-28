@@ -1,4 +1,4 @@
-import { TrendResult, MarketStructure, Level, IndicatorSnapshot, SetupScoreResult } from '../types';
+import { TrendResult, SetupScoreResult } from '../types';
 import { SetupEvaluation } from '../setup/types';
 import { TradeLevels } from '../trade-levels/types';
 

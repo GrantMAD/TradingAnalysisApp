@@ -18,7 +18,6 @@ import { identifyLiquidityZones } from './levels/liquidity';
 import { detectCandlestickPatterns } from './patterns/candlestick-patterns';
 import { detectChartPatterns } from './patterns/chart-patterns';
 
-import { calculateSetupScore } from './scoring/setup-score';
 
 export * from './types';
 export * from './patterns/candlestick-patterns';
@@ -47,7 +46,7 @@ export async function runTechnicalAnalysis(params: {
   higherTimeframeContext?: MultiTimeframeContext;
   proposedDirection?: 'long' | 'short'; // Optional for scoring
 }): Promise<TAResult> {
-  const { candles, currentPrice, userSettings, higherTimeframeContext, proposedDirection } = params;
+  const { candles, currentPrice, userSettings, higherTimeframeContext } = params;
 
   // 1. Calculate Indicators
   const rsi = calculateRSI(candles, (userSettings.rsiPeriod as number) || 14);
@@ -77,8 +76,6 @@ export async function runTechnicalAnalysis(params: {
     adx,
     vwap: vwapResult.values
   };
-
-  const hasVolume = !vwapResult.reason;
 
   // 2. Structure Analysis
   const swings = detectSwingPoints(candles, (userSettings.swingLookback as number) || 3);

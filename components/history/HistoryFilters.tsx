@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
-import { useCallback, useState, useEffect } from 'react';
+import { useCallback } from 'react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { Label } from '../ui/label';
 import { Button } from '../ui/button';
@@ -12,16 +12,9 @@ export function HistoryFilters() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const [decision, setDecision] = useState<string>(searchParams.get('decision') || 'ALL');
-  const [timeframe, setTimeframe] = useState<string>(searchParams.get('timeframe') || 'ALL');
-  const [sort, setSort] = useState<string>(searchParams.get('sort') || 'newest');
-
-  // Sync state with URL if URL changes externally
-  useEffect(() => {
-    setDecision(searchParams.get('decision') || 'ALL');
-    setTimeframe(searchParams.get('timeframe') || 'ALL');
-    setSort(searchParams.get('sort') || 'newest');
-  }, [searchParams]);
+  const decision = searchParams.get('decision') || 'ALL';
+  const timeframe = searchParams.get('timeframe') || 'ALL';
+  const sort = searchParams.get('sort') || 'newest';
 
   const createQueryString = useCallback(
     (name: string, value: string) => {
@@ -41,10 +34,6 @@ export function HistoryFilters() {
   );
 
   const handleFilterChange = (key: string, value: string) => {
-    if (key === 'decision') setDecision(value);
-    if (key === 'timeframe') setTimeframe(value);
-    if (key === 'sort') setSort(value);
-    
     router.push(pathname + '?' + createQueryString(key, value));
   };
 
@@ -110,7 +99,7 @@ export function HistoryFilters() {
           </Select>
         </div>
 
-        <div className="flex items-end pb-[1px]">
+        <div className="flex items-end pb-px">
           {hasActiveFilters && (
             <Button 
               variant="ghost" 

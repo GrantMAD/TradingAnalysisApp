@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '../../../../components/ui/button';
 import { SupabaseClient } from '@supabase/supabase-js';
+import { normalizeHistoryInstrument } from '../../../../components/history/types';
 
 export const metadata: Metadata = {
   title: "Compare Analyses - AI Trading Analyst",
@@ -124,7 +125,7 @@ export default async function HistoryComparePage({
         <div className="space-y-4">
           <div className="sticky top-0 z-10 glass p-3 rounded-lg border border-border/50 text-center font-medium bg-background/95 backdrop-blur">
             <div className="text-sm text-muted-foreground">Analysis 1</div>
-            <div className="text-lg">{(data1.analysis.instrument as any)?.symbol} • {data1.analysis.timeframe.toUpperCase()}</div>
+            <div className="text-lg">{normalizeHistoryInstrument(data1.analysis.instrument)?.symbol} • {data1.analysis.timeframe.toUpperCase()}</div>
           </div>
           <AnalysisPanel 
             analysis={data1.analysis} 
@@ -139,7 +140,7 @@ export default async function HistoryComparePage({
         <div className="space-y-4">
           <div className="sticky top-0 z-10 glass p-3 rounded-lg border border-border/50 text-center font-medium bg-background/95 backdrop-blur">
             <div className="text-sm text-muted-foreground">Analysis 2</div>
-            <div className="text-lg">{(data2.analysis.instrument as any)?.symbol} • {data2.analysis.timeframe.toUpperCase()}</div>
+            <div className="text-lg">{normalizeHistoryInstrument(data2.analysis.instrument)?.symbol} • {data2.analysis.timeframe.toUpperCase()}</div>
           </div>
           <AnalysisPanel 
             analysis={data2.analysis} 

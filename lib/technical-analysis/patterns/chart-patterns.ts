@@ -8,6 +8,7 @@ import { SwingPoint, Level, ChartPattern } from '../types';
  * @returns Array of ChartPatterns
  */
 export function detectChartPatterns(swings: SwingPoint[], levels: Level[]): ChartPattern[] {
+  void levels;
   const patterns: ChartPattern[] = [];
   
   if (swings.length < 5) {
