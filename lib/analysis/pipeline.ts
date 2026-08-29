@@ -49,6 +49,7 @@ import { buildAIContextPackage, CRITICAL_STALENESS_THRESHOLD_MINUTES } from './c
 import { buildSystemPrompt, buildUserPrompt, METHODOLOGY_VERSION } from './prompts';
 import { callAI } from './ai-client';
 import { validateAIResponse } from './validator';
+import { filterFreshCandlesForPersistence } from './candle-ingestion';
 import type { AnalysisPipelineParams, AnalysisPipelineResult, AIAnalysisResult } from './types';
 
 /** Convert market-data Candle to TA-engine Candle (field rename: timestamp → time). */
@@ -61,6 +62,33 @@ function toTACandle(c: MDCandle): TACandle {
     close: c.close,
     volume: c.volume,
   };
+}
+
+async function getNewestStoredCandleTimestamp(
+  supabase: Awaited<ReturnType<typeof createAdminClient>>,
+  instrumentId: string,
+  timeframe: string,
+  provider: string,
+): Promise<number | null> {
+  const { data, error } = await supabase
+    .from('candles')
+    .select('candle_time')
+    .eq('instrument_id', instrumentId)
+    .eq('timeframe', timeframe)
+    .eq('provider', provider)
+    .order('candle_time', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (error && error.code !== 'PGRST116') {
+    throw error;
+  }
+
+  if (!data?.candle_time) {
+    return null;
+  }
+
+  return Math.floor(new Date(data.candle_time).getTime() / 1000);
 }
 
 /**
@@ -146,23 +174,36 @@ export async function runAnalysisPipeline(
     }
 
     // ─── Step 5: Upsert candles to DB ─────────────────────────────────────
-    const candleRows = mdCandles.map((c) => ({
-      instrument_id: params.instrumentId,
-      timeframe: params.timeframe,
-      candle_time: new Date(c.timestamp * 1000).toISOString(),
-      open: c.open,
-      high: c.high,
-      low: c.low,
-      close: c.close,
-      volume: c.volume ?? null,
-      provider: quality.provider,
-    }));
+    const newestStoredTimestamp = await getNewestStoredCandleTimestamp(
+      supabase,
+      params.instrumentId,
+      params.timeframe,
+      quality.provider,
+    );
 
-    // Upsert — ignore conflicts (same candle from same provider already stored).
-    await supabase.from('candles').upsert(candleRows, {
-      onConflict: 'instrument_id,timeframe,candle_time,provider',
-      ignoreDuplicates: true,
-    });
+    const candlesToPersist = filterFreshCandlesForPersistence(mdCandles, newestStoredTimestamp);
+
+    if (candlesToPersist.length > 0) {
+      const candleRows = candlesToPersist.map((c) => ({
+        instrument_id: params.instrumentId,
+        timeframe: params.timeframe,
+        candle_time: new Date(c.timestamp * 1000).toISOString(),
+        open: c.open,
+        high: c.high,
+        low: c.low,
+        close: c.close,
+        volume: c.volume ?? null,
+        provider: quality.provider,
+      }));
+
+      // Upsert only genuinely new candle rows for this instrument/timeframe/provider.
+      // This avoids re-writing the same history on each analysis refresh while preserving
+      // the normalized shared candle table for active market-data reuse.
+      await supabase.from('candles').upsert(candleRows, {
+        onConflict: 'instrument_id,timeframe,candle_time,provider',
+        ignoreDuplicates: true,
+      });
+    }
 
     // ─── Step 6: Insert market_snapshots record ────────────────────────────
     const latestCandle = mdCandles[mdCandles.length - 1];
